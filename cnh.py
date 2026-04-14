@@ -1,8 +1,8 @@
 #cnh.py
-from datetime import datetime
+from datetime import datetime, date
 nome=input("Informe o nome do condutor:")
 dt_nasc_str=input("Informe a data de nascimento do condutor:")
-dt_nasc=datetime.strptime(dt_nasc_str, "%d/%m/%y").date()
+dt_nasc=datetime.strptime(dt_nasc_str, "%d/%m/%Y").date()
 dt_hoje=date.today()
 if dt_hoje.year - dt_nasc.year >= 18:
     tc=input("Tem CNH(S/N)?")
