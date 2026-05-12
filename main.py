@@ -1,10 +1,11 @@
 import json
 import os
 
-arquivos="contatos.js"
+ARQUIVO="contatos.js"
+
 #funções
 def carregar_contatos():
-    if not os.path.exists(arquivo):
+    if not os.path.exists(ARQUIVO):
         return[]
     with open(arquivo, "r", enconding="utf-8") as arquivo:
         return json.load(arquivo)
@@ -20,9 +21,9 @@ def cadastrar_contato(contatos):
     email=input("E-mail:")
 
     contato={
-        "nome":Nome,
-        "telefone":Telefone,
-        "email":Email
+        "nome":nome,
+        "telefone":telefone,
+        "email":email
     }
     contatos.append(contato)
     salvar_contato(contatos)
@@ -33,34 +34,34 @@ def listar_contatos(contatos):
         print("\nNenhum contato cadastrado.\n")
         return
     print("\n::Contatos::")
-    for i, contato in (contatos, start=1):
+    for i, contato in enumerate(contatos, start=1):
         print(f"""
-        contato{i}
-        nome:{contato['nome']}
-        telefone:{contato['telefone']}
-        email:{contato['email']}
-        """)
+contato{i}
+nome:{contato['nome']}
+telefone:{contato['telefone']}
+email:{contato['email']}
+""")
 
 def buscar_contato(contatos):
     nome=input("Digite o nome para buscar:").lower()
     encontrados=[
         contato for contato in contatos
         if nome in contato["nome"].lower()
-        ]
-        if not encontrados:
-            print("\nContato não encontrado.\n")
-            return
-        print("\n::Resultados::")
-        for contato in encontrados:
-            print(f"""
-            nome:{contato['nome']}
-            telefone:{contato['telefone']}
-            email:{contato['email']}
-            """)
+    ]
+    if not encontrados:
+        print("\nContato não encontrado.\n")
+        return
+    print("\n::Resultados::")
+    for contato in encontrados:
+        print(f"""
+nome:{contato['nome']}
+telefone:{contato['telefone']}
+email:{contato['email']}
+""")
 
 def editar_contato(contatos):
     listar_contatos(contatos)
-    try
+    try:
         indice=int(input("informe o numero do contato que deseja editar:"))-1
         if indice<0 or indice >=len(contatos):
             print("contato inválido")
@@ -75,9 +76,9 @@ def editar_contato(contatos):
     except ValueError:
         print("Digite um número válido.")
         
-def excluir_contato(contatos)
+def excluir_contato(contatos):
     listar_contatos(contatos)
-    try
+    try:
         indice=int(input("informe o número do contato que deseja excluir:"))-1
         if indice<0 or indice >=len(contatos):
             print("contato inválido")
@@ -93,15 +94,15 @@ def menu():
     contatos=carregar_contatos()
     while True:
         print("""
-        ::AGENDA::
-        1-Cadastrar contato
-        2-Listar contato
-        3-Buscar contato
-        4-Editar contato
-        5-Excluir contato
-        0-Sair
-        ::------::
-        """)
+::AGENDA::
+1-Cadastrar contato
+2-Listar contato
+3-Buscar contato
+4-Editar contato
+5-Excluir contato
+0-Sair
+::------::
+""")
         opcao=input("Escolha:")
         match opcao:
             case'1':
