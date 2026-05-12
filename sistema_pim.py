@@ -139,6 +139,7 @@ def listar_estoque():
 def listar_residuos():
     if len(residuos) == 0:
         print("Sem registro!")
+        return 
 
     for item in residuos:
         print(f"{item['tipo']} - {item['quantidade']}")
@@ -191,9 +192,9 @@ def relatorio_ambiental():
          nome = item["tipo"]
 
          if nome in tipos:
-             tipos["nome"] += item["quantidade"]
+             tipos[nome] += item["quantidade"]
          else:
-             tipos["nome"] = item["quantidade"]
+             tipos[nome] = item["quantidade"]
 
      mais_gerado = max(tipos, key=tipos.get)
 
