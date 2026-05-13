@@ -1,18 +1,18 @@
 import json
 import os
 
-ARQUIVO="contatos.js"
+ARQUIVO="contatos.json"
 
 #funções
 def carregar_contatos():
     if not os.path.exists(ARQUIVO):
         return[]
-    with open(arquivo, "r", enconding="utf-8") as arquivo:
+    with open(ARQUIVO, "r", encoding="utf-8") as arquivo:
         return json.load(arquivo)
 
 def salvar_contato(contatos):
-    with open(arquivo,"w",encoding="utf-8") as arquivo:
-        json.dump(contatos, arquivo, intent=4, ensure_ascii=false)
+    with open(ARQUIVO,"w",encoding="utf-8") as arquivo:
+        json.dump(contatos, arquivo, indent=4, ensure_ascii=False)
 
 #crud
 def cadastrar_contato(contatos):
@@ -83,9 +83,9 @@ def excluir_contato(contatos):
         if indice<0 or indice >=len(contatos):
             print("contato inválido")
             return
-        removido=contato.pop(indice)
+        removido=contatos.pop(indice)
         salvar_contato(contatos)
-        print(f"Contato{removido['nome']}removido")
+        print(f"Contato {removido['nome']} removido")
     except ValueError:
         print("Informe um número válido")
 
