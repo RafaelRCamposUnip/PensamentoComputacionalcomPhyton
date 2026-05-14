@@ -4,6 +4,17 @@ producao = []
 estoque = []
 residuos = []
 
+consumo_materiais = {
+    "trator": {
+        "aco": 5,
+        "parafuso": 2
+    },
+    "arado": {
+        "aco": 3,
+        "tinta":1
+    }
+}
+
 def registrar_producao():
     while True:
         data = input("Informe a data (dd/mm/aaaa): ")
@@ -19,6 +30,31 @@ def registrar_producao():
                 break
             except ValueError:
                 print("Digite apenas números!")
+
+        if producao.lower() in consumo_materiais:
+            materiais = consumo_materiais[produto.lower()]
+
+            for material, consumo in materiais.items():
+                consumo_total = consumo * quantidade
+
+                encontrado = False
+
+                for item_estoque in estoque:
+                    if item_estoque["material"].lower() == material.lower():
+
+                        encontrado = True
+
+                        if consumo_total > item_estoque["quantidade"]:
+
+                            print(f"Estoque insuficiente de {material}!")
+                            return
+
+                        item_estoque["quantidade"] -= consumo_total
+                        exportar_estoque_csv()
+
+            if not encontrado:
+                print(f"Material {material} não encontrado no estoque!")
+                return
 
         registro = {
             "data": data,
@@ -101,6 +137,26 @@ def registrar_residuo():
                 break
             except ValueError:
                 print("Digite apenas números!")
+
+        estoque_encontrado = False
+
+        for item_estoque in estoque:
+
+            if item_estoque["material"].lower() == tipo.lower():
+
+                estoque_encontrado = True
+
+                if quantidade > item_estoque["quantidade"]:
+                    print("Quantidade insuficiente no estoque!")
+                    break
+
+                item_estoque["quantidade"] -= quantidade
+
+                exportar_estoque_csv()
+
+        if not estoque_encontrado:
+            print("Material não encontrado!")
+            continue
 
         for item in residuos:
             if item["tipo"].lower() == tipo.lower():
@@ -367,7 +423,9 @@ def editar_producao():
 
             nova_data = input("Nova data: ")
             novo_produto = input("Novo produto: ")
+
             while True:
+
                  try:
                      nova_quantidade = int(input("Nova quantidade: "))
                      break
@@ -398,7 +456,9 @@ def editar_estoque():
             print(f"Quantidade: {item['quantidade']}")
 
             novo_material = input("Novo material: ")
+
             while True:
+
                  try:
                      nova_quantidade = int(input("Nova quantidade: "))
                      break
@@ -423,6 +483,10 @@ def editar_residuos():
 
     for item in residuos:
         if item["tipo"].lower() == busca:
+
+            tipo_antigo = item["tipo"]
+            quantidade_antiga = item["quantidade"]
+
             print("\nRegistro encontrado:")
             print(f"Resíduo: {item['tipo']}")
             print(f"Quantidade: {item['quantidade']}")
@@ -432,16 +496,41 @@ def editar_residuos():
                  try:
                      nova_quantidade = int(input("Nova quantidade: "))
                      break
+
                  except ValueError:
                      print("Digite apenas números!")
 
-                 item['material'] = novo_residuo
-                 item['quantidade'] = nova_quantidade
+            for item_estoque in estoque:
 
-                 exportar_residuos_csv()
+                if item_estoque["material"].lower() == tipo_antigo.lower():
+                    item_estoque["quantidade"] += quantidade_antiga
+                    break
 
-                 print("Registro atualizado com sucesso!")
-                 return
+            estoque_encontrado = False
+
+            for item_estoque in estoque:
+                if item_estoque["material"].lower() == novo_residuo.lower():
+                    estoque_encontrado = True
+
+                    if nova_quantidade > item_estoque["quantidade"]:
+                        print("Quantidade insuficiente no estoque!")
+                        return
+
+                    item_estoque["quantidade"] -= nova_quantidade
+                    exportar_estoque_csv()
+                    break
+
+            if not estoque_encontrado:
+                print("Material não encontrado!")
+                return
+
+            item['tipo'] = novo_residuo
+            item['quantidade'] = nova_quantidade
+
+            exportar_residuos_csv()
+
+            print("Registro atualizado com sucesso!")
+            return
     print("Resíduo não encontrado!")
 
 def excluir_producao():
@@ -471,8 +560,76 @@ def excluir_producao():
             else:
                 print("Exclusão cancelada.")
                 return
-            
+
     print("Produto não encontrado!")
+
+def excluir_estoque():
+    if len(estoque) == 0:
+        print("Nenhum registro encontrado!")
+        return
+
+    busca = input("Digite o nome do material que deseja  excluir: ").lower()
+
+    for item in estoque:
+        if item["material"].lower() == busca:
+            print("\nRegistro encontrado:")
+            print(f"Material: {item['material']}")
+            print(f"Quantidade: {item['quantidade']}")
+
+            confirmar = input("Deseja excluir esse registro? (s/n): ").lower()
+
+            if confirmar == 's':
+                producao.remove(item)
+
+                exportar_estoque_csv()
+
+                print("Registro excluido com sucesso!")
+                return
+
+            else:
+                print("Exclusão cancelada.")
+                return
+
+    print("Material não encontrado!")
+
+def excluir_residuos():
+    if len(residuos) == 0:
+        print("Nenhum registro encontrado!")
+        return
+
+    busca = input("Digite o nome do resíduo que deseja  excluir: ").lower()
+
+    for item in estoque:
+        if item["tipo"].lower() == busca:
+            print("\nRegistro encontrado:")
+            print(f"Resíduo: {item['tipo']}")
+            print(f"Quantidade: {item['quantidade']}")
+
+            confirmar = input("Deseja excluir esse registro? (s/n): ").lower()
+
+            if confirmar == 's':
+
+                for item_estoque in estoque:
+
+                    if item_estoque["material"].lower() == item["tipo"].lower():
+
+                        item_estoque["quantidade"] += item["quantidade"]
+
+                        exportar_estoque_csv()
+                        break
+
+                producao.remove(item)
+
+                exportar_residuos_csv()
+
+                print("Registro excluido com sucesso!")
+                return
+
+            else:
+                print("Exclusão cancelada.")
+                return
+
+    print("Resíduo não encontrado!")
 
 carregar_producao_csv()
 carregar_estoque_csv()
@@ -495,6 +652,8 @@ while True:
     print("13- Editar estoque")
     print("14- Editar resíduos")
     print("15- Excluir produção")
+    print("16- Excluir estoque")
+    print("17- Excluir resíduos")
     print("0- Sair")
 
     opcao = input("Escolha uma opção: ")
@@ -540,9 +699,15 @@ while True:
 
     elif opcao == "14":
         editar_residuos()
-        
+
     elif opcao == '15':
         excluir_producao()
+
+    elif opcao == '16':
+        excluir_estoque()
+
+    elif opcao == '17':
+        excluir_residuos()
 
     elif opcao == "0":
         print("Encerrando sistema...")
